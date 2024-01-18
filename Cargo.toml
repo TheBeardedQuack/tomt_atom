@@ -2,7 +2,10 @@
 name = "tomt_atom"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+authors = ["TheBeardedQuack", "Tome of Many Things"]
+categories = ["caching", "memory-management"]
+description = "Basic Atom (string) registry for use with ID strings. For when an application contains and passes around many constant strings (mainly de/serialized strings), this should reduce the overall memory footprint and slightly increase cache usage"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/TheBeardedQuack/tomt_atom.git"
+documentation = "https://docs.rs/tomt_atom"
+homepage = "https://crates.io/crates/tomt_atom"

@@ -7,6 +7,8 @@ A basic Atom (string) registry for use with ID strings.
 
 For when an application contains and passes around many constant strings (mainly de/serialized strings), this should reduce the overall memory footprint and slightly increase cache usage
 
+> **Warning**: The performance implications of this crate should be tested to ensure it's a good fit for your use-case. There are many sitatuations where such a caching mechanism is simply unnecessary and this crate may easily harm performance due to the memory allocation required to register an atom, as well as the hash-lookup.
+
 ## Inspiration for this project:
 - [Use Arc instead of Vec](https://www.youtube.com/watch?v=A4cKi7PTJSs&ab_channel=LoganSmith) - Logan Smith (YouTube/[@_noisecode]((https://www.youtube.com/@_noisecode)))
 - [Atom Tables](https://learn.microsoft.com/en-us/windows/win32/dataxchg/about-atom-tables) - Microsoft Windows

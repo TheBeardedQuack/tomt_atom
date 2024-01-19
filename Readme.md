@@ -72,6 +72,8 @@ Cloned registries point to the same atom table and updates in one will be reflec
 |  0.1.2  | Updated readme usage. Improved construct semantics |
 |  0.1.3  | Added `Display` trait to `Atom` |
 |  0.1.4  | Added `PartialEq` and `Eq` traits to `Atom` |
+|  0.1.5  | Added feature "serde" to implement `Deserialize`/`Serialize` |
+|  0.1.6  | Added `Default` trait to `Atom` and `AtomRegistry` |
 
 # Contributing
 

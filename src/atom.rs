@@ -1,12 +1,15 @@
 use std::{
     fmt::Display,
     ops::Deref,
-    sync::Arc,
+    sync::{Arc, OnceLock, Weak},
 };
 
 #[derive(Clone, Debug)]
 #[derive(PartialEq, Eq)]
 pub struct Atom(Arc<str>);
+pub type WeakAtom = Weak<str>;
+
+static EMPTY_ATOM: OnceLock<Atom> = OnceLock::new();
 
 #[cfg(feature = "serde")]
 impl<'de> serde::Deserialize<'de>
@@ -52,6 +55,22 @@ impl Atom
         text: S
     ) -> Self {
         Self::from(text.as_ref())
+    }
+
+    pub fn as_weak(
+        &self
+    ) -> WeakAtom {
+        Arc::downgrade(&self.0)
+    }
+}
+
+impl Default
+for Atom
+{
+    fn default(
+        // no args
+    ) -> Self {
+        EMPTY_ATOM.get_or_init(|| Atom::new("")).clone()
     }
 }
 

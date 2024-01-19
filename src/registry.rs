@@ -1,4 +1,4 @@
-use crate::Atom;
+use crate::{Atom, WeakAtom};
 
 use std::{
     collections::HashMap,
@@ -8,28 +8,18 @@ use std::{
     },
 };
 
-type WeakAtom = Weak<str>;
-
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct AtomRegistry(Arc<Mutex<HashMap<String, WeakAtom>>>);
-
-static ATOMS: OnceLock<AtomRegistry> = OnceLock::new();
-static EMPTY: OnceLock<Atom> = OnceLock::new();
+static DEFAULT_REGISTRY: OnceLock<AtomRegistry> = OnceLock::new();
 
 impl AtomRegistry
 {
-    pub fn global(
-        // no args
-    ) -> Self {
-        ATOMS.get_or_init(Self::new).clone()
-    }
-
     pub fn new(
         // no args
     ) -> Self {
-        let empty = EMPTY.get_or_init(|| Atom::from(""));
+        let empty = Atom::default();
         let mut map = HashMap::new();
-        map.insert(empty.to_string(), Arc::downgrade(empty));
+        map.insert(empty.to_string(), empty.as_weak());
 
         Self(Arc::new(Mutex::new(map)))
     }
@@ -62,5 +52,15 @@ impl AtomRegistry
             .expect("Mutex poisoned");
 
         _ = lock.remove_entry(value.as_ref());
+    }
+}
+
+impl Default
+for AtomRegistry
+{
+    fn default(
+        // no args
+    ) -> Self {
+        DEFAULT_REGISTRY.get_or_init(Self::new).clone()
     }
 }

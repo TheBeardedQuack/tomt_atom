@@ -1,6 +1,6 @@
 [package]
 name = "tomt_atom"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 authors = ["TheBeardedQuack", "Tome of Many Things"]
 categories = ["caching", "memory-management"]

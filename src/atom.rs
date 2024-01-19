@@ -5,6 +5,7 @@ use std::{
 };
 
 #[derive(Clone, Debug)]
+#[derive(PartialEq, Eq)]
 pub struct Atom(Arc<str>);
 
 impl Atom

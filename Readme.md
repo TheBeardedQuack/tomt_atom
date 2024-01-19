@@ -15,24 +15,53 @@ For when an application contains and passes around many constant strings (mainly
 
 # Usage
 
-To use TOMT_BevyCSS just add a `StyleSheet` with a loaded `css` file to any entity and all style sheet rules will be applied to the entity and _all_ its [`descendants`][80] (children of children of children and so on).
+Atoms can be created directly and either passed by ref into functions, or cloned to avoid Rust's ownership semantics.
 
 ```rust
 use tomt_atom::Atom;
 
-fn example_create()
+fn construct_example()
 {
-    // Create atom directly with constructor
-    let atom = Atom::new("From constructor");
+    // Create atoms directly with `new()` constructor
+    let atom = Atom::new("My &'static str example");
 
-    // Convert from any &str
-    let atom: Atom = "From string".into();
+    // `new()` accepts any type that implements `AsRef<str>`
+    let atom = Atom::new(String::new("My owned String example"));
+}
 
-    // Including String, or any &str-like object (impls AsRef<str>)
-    let string = String::new("Example string");
-    let atom = string.into();
+fn convert_example()
+{
+    // Atom supports `From<&str>` and `From<String>``
+    let atom: Atom = "Another &'static str example".into();
+
+    // This should help if you need pass atoms directly
+    let result = function_accepting_atom("Quick convert example".into())
+}
+
+```
+
+Ideally atoms should be registered into a global table. This will provide lookups to return an existing atom if present, or create one if not. Atoms on there own may reduce the overall memory footprint, but with a registry the same string will always yield the same atom.
+
+```rust
+use tomt_atom::*;
+
+fn global_registry()
+{
+    // Use built-in global registry
+    let accept = AtomRegistry::global().register("application/json");
+    
+    // Create your own registry to pass via a service
+    let mimes = AtomRegistry::new();
+    let accept = mimes.register("application/json");
+
+    // Unregistering will remove the entry in the lookup table, but all existing
+    // Atoms will remain valid, and may continue to be cloned and passed around
+    mimes.unregister("application/json");
 }
 ```
+
+Registries are indirect, support `Send`/`Sync` and can be cheaply cloned.
+Cloned registries point to the same atom table and updates in one will be reflected in both.
 
 # Changelog
 
@@ -40,6 +69,7 @@ fn example_create()
 |:-------:|-----------------|
 |  0.1.0  | Initial-release |
 |  0.1.1  | Fixed potential hash-collision bug |
+|  0.1.2  | Updated readme usage. Improved construct semantics |
 
 # Contributing
 
@@ -53,7 +83,7 @@ TOMT_Atom is dual-licensed under either:
 * Apache License, Version 2.0 (in [repository][license-Apache-local] or from [source][license-MIT-remote])
 
 This means you can select the license you prefer!
-This dual-licensing approach is the de-facto standard in the Rust ecosystem and there are [very good reasons][55] to include both.
+This dual-licensing approach is the de-facto standard in the Rust ecosystem and there are good reasons to include both.
 
 <!-- Icons -->
 [icon-license]: https://img.shields.io/badge/license-MIT%2FApache-blue.svg 

@@ -70,6 +70,7 @@ Cloned registries point to the same atom table and updates in one will be reflec
 |  0.1.0  | Initial-release |
 |  0.1.1  | Fixed potential hash-collision bug |
 |  0.1.2  | Updated readme usage. Improved construct semantics |
+|  0.1.3  | Added `Display` trait to `Atom` |
 
 # Contributing
 

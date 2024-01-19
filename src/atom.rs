@@ -1,4 +1,5 @@
 use std::{
+    fmt::Display,
     ops::Deref,
     sync::Arc,
 };
@@ -39,6 +40,17 @@ for Atom
         &self
     ) -> &Self::Target {
         &self.0
+    }
+}
+
+impl Display
+for Atom
+{
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>
+    ) -> std::fmt::Result {
+        self.as_str().fmt(f)
     }
 }
 

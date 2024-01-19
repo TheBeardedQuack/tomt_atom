@@ -39,6 +39,7 @@ fn example_create()
 | Version | Changes         |
 |:-------:|-----------------|
 |  0.1.0  | Initial-release |
+|  0.1.1  | Fixed potential hash-collision bug |
 
 # Contributing
 

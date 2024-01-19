@@ -1,9 +1,5 @@
 use std::{
-    collections::{
-        hash_map::DefaultHasher,
-        HashMap,
-    },
-    hash::{Hash, Hasher},
+    collections::HashMap,
     ops::Deref,
     sync::{
         Arc, Weak,
@@ -11,14 +7,65 @@ use std::{
     },
 };
 
+static EMPTY: OnceLock<Atom> = OnceLock::new();
+pub static ATOMS: OnceLock<AtomRegistry> = OnceLock::new();
+
 #[derive(Clone, Debug)]
 pub struct Atom(Arc<str>);
 
 type WeakAtom = Weak<str>;
-type AtomRegistry = HashMap<u64, WeakAtom>;
 
-static EMPTY: OnceLock<Atom> = OnceLock::new();
-static ATOMS: OnceLock<Mutex<AtomRegistry>> = OnceLock::new();
+#[derive(Clone, Debug, Default)]
+pub struct AtomRegistry(Arc<Mutex<HashMap<String, WeakAtom>>>);
+
+impl AtomRegistry
+{
+    pub fn global(
+        // no args
+    ) -> Self {
+        ATOMS.get_or_init(Self::new).clone()
+    }
+
+    pub fn new(
+        // no args
+    ) -> Self {
+        let empty = EMPTY.get_or_init(|| Atom::from(""));
+        let mut map = HashMap::new();
+        map.insert(empty.to_string(), Arc::downgrade(empty));
+
+        Self(Arc::new(Mutex::new(map)))
+    }
+
+    pub fn register<S: AsRef<str>>(
+        &mut self,
+        value: S
+    ) -> Atom {
+        let mut lock = self.0.lock()
+            .expect("Mutex poisoned");
+
+        let arc = lock.get(value.as_ref())
+            .and_then(Weak::upgrade)
+            .unwrap_or_else(|| {
+                let s = value.as_ref().to_string();
+                let arc = Arc::from(s.as_ref());
+                _ = lock.insert(s, Arc::downgrade(&arc));
+
+                arc
+            });
+
+        Atom::new(arc)
+    }
+
+    pub fn unregister<S: AsRef<str>>(
+        &mut self,
+        value: S
+    ) {
+        let mut lock = self.0.lock()
+            .expect("Mutex poisoned");
+
+        _ = lock.remove_entry(value.as_ref());
+    }
+}
 
 impl Atom
 {
@@ -29,39 +76,32 @@ impl Atom
         &self.0
     }
 
-    pub fn new(
-        text: &str
+    pub(crate) fn new(
+        inner: Arc<str>
     ) -> Self {
-        let reg = ATOMS.get_or_init(|| {
-            let empty = EMPTY.get_or_init(|| "".into());
-            let mut map = HashMap::new();
-            map.insert(
-                hash_str(&*empty),
-                Arc::downgrade(&empty.0)
-            );
-            
-            Mutex::new(map)
-        });
-        let mut reg_lock = reg.lock().expect("Mutex poisoned");
-
-        let hash = hash_str(text);
-        let arc = reg_lock.get(&hash)
-            .and_then(Weak::upgrade)
-            .unwrap_or_else(|| Arc::from(text));
-
-        _ = reg_lock.insert(hash, Arc::downgrade(&arc));
-        Self(arc)
+        Self(inner)
     }
 }
 
 impl Deref
 for Atom
 {
-    type Target = str;
+    type Target = Arc<str>;
+
     fn deref(
         &self
     ) -> &Self::Target {
-        self.as_str()
+        &self.0
+    }
+}
+
+impl AsRef<str>
+for Atom
+{
+    fn as_ref(
+        &self
+    ) -> &str {
+        self.0.as_ref()
     }
 }
 
@@ -81,21 +121,22 @@ for A {
     }
 }
 
-impl<S: AsRef<str>> From<S>
+impl From<&str>
 for Atom
 {
     fn from(
-        value: S
+        value: &str
     ) -> Self {
-        Self::new(value.as_ref())
+        Self::new(Arc::from(value))
     }
 }
 
-fn hash_str(
-    text: &str
-) -> u64 {
-    let mut hasher = DefaultHasher::new();
-    text.hash(&mut hasher);
-
-    hasher.finish()
+impl From<String>
+for Atom
+{
+    fn from(
+        value: String
+    ) -> Self {
+        Self::new(Arc::from(value.as_ref()))
+    }
 }

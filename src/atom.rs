@@ -8,6 +8,29 @@ use std::{
 #[derive(PartialEq, Eq)]
 pub struct Atom(Arc<str>);
 
+#[cfg(feature = "serde")]
+impl<'de> serde::Deserialize<'de>
+for Atom{
+    fn deserialize<D: serde::Deserializer<'de>> (
+        deserializer: D
+    ) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+#[cfg(feature = "serde")]
+impl serde::Serialize
+for Atom
+{
+    fn serialize<S: serde::Serializer>(
+        &self,
+        serializer: S
+    ) -> Result<S::Ok, S::Error> {
+        self.as_str().serialize(serializer)
+    }
+}
+
 impl Atom
 {
     #[inline]

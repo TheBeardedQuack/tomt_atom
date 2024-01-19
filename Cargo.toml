@@ -1,6 +1,6 @@
 [package]
 name = "tomt_atom"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 authors = ["TheBeardedQuack", "Tome of Many Things"]
 categories = ["caching", "memory-management"]
@@ -9,3 +9,10 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/TheBeardedQuack/tomt_atom.git"
 documentation = "https://docs.rs/tomt_atom"
 homepage = "https://crates.io/crates/tomt_atom"
+
+[features]
+default = []
+serde = ["dep:serde"]
+
+[dependencies]
+serde = { version = "1.0.195", optional = true }

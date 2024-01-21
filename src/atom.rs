@@ -4,8 +4,14 @@ use std::{
     sync::{Arc, OnceLock, Weak},
 };
 
+#[cfg(feature = "from_str")]
+use std::{
+    convert::Infallible,
+    str::FromStr,
+};
+
 #[derive(Clone, Debug)]
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Hash)]
 pub struct Atom(Arc<str>);
 pub type WeakAtom = Weak<str>;
 
@@ -150,5 +156,18 @@ for Atom
         value: Arc<str>
     ) -> Self {
         Self(value)
+    }
+}
+
+#[cfg(feature = "from_str")]
+impl FromStr
+for Atom
+{
+    type Err = Infallible;
+
+    fn from_str(
+        s: &str
+    ) -> Result<Self, Self::Err> {
+        Ok(Self::new(s))
     }
 }

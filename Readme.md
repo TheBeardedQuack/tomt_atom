@@ -74,6 +74,7 @@ Cloned registries point to the same atom table and updates in one will be reflec
 |  0.1.4  | Added `PartialEq` and `Eq` traits to `Atom` |
 |  0.1.5  | Added feature "serde" to implement `Deserialize`/`Serialize` |
 |  0.1.6  | Added `Default` trait to `Atom` and `AtomRegistry` |
+|  0.1.7  | Added infallible `FromStr` trait to `Atom` (I need this for use in higher projects, so it's via feature "from_str"). Added `Hash` trait to `Atom` |
 
 # Contributing
 

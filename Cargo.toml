@@ -1,6 +1,6 @@
 [package]
 name = "tomt_atom"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 authors = ["TheBeardedQuack", "Tome of Many Things"]
 categories = ["caching", "memory-management"]
@@ -12,6 +12,7 @@ homepage = "https://crates.io/crates/tomt_atom"
 
 [features]
 default = []
+from_str = []
 serde = ["dep:serde"]
 
 [dependencies]
